@@ -15,7 +15,7 @@
 进入项目根目录下打开终端
 ```
 # 编译程序
-gcc -o search test.c
+gcc -o test test.c
 
 # 运行程序
 ./test
