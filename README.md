@@ -1,9 +1,13 @@
 # Search Demo 2024
 
 ## 项目简介 (Project Description)
-中国五级行政区划代码查询
+中国五级行政区划代码查询，纯 C 语言实现，无第三方依赖。
 
-数据来自: https://github.com/adyliu/china_area
+区划数据来自: https://github.com/adyliu/china_area
+
+本项目仅使用 area_code_2024.csv 和 area_code_2024.sql 文件中的数据。
+
+仅用于学习交流，请勿用于其他用途。
 
 ## 使用方式 (Usage)  
 提供两种检索方法:
