@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/ying/Downloads/china_area-2024/test'
+relocations:     []
+...
