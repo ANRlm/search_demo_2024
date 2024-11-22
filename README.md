@@ -18,11 +18,19 @@ gcc -o search test.c
 ```
 
 ### function 2 (sql)
-进入项目根目录下打开终端
+进入项目根目录下打开终端, 确保已安装 sqlite3 开发库
 ```
 # 在 Ubuntu/Debian 上安装 sqlite3 开发库
 sudo apt-get install libsqlite3-dev
 
+# windows 安装 sqlite3 开发库
+https://www.sqlite.org/download.html
+
+# macos 安装 sqlite3 开发库
+brew install sqlite3
+```
+
+```
 # 编译程序
 gcc -o import import.c -lsqlite3
 gcc -o query query.c -lsqlite3
