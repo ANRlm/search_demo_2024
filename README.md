@@ -35,8 +35,6 @@ brew install sqlite3
 gcc -o import import.c -lsqlite3
 gcc -o query query.c -lsqlite3
 
-# 确保 area_code_2024.csv 文件存在
-
 # 导入数据
 ./import
 
