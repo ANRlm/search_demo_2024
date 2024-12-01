@@ -1,0 +1,37 @@
+# macOS 系统生成的文件
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS Finder 生成的文件
+*.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.VolumeIcon.icns
+.AppleDouble
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# macOS 特定的资源库文件
+*.plist
+
+# macOS 系统的 Swap 文件
+*~.nib
+*.swp
+.*.swp
+
+# macOS 特定开发工具的文件
+xcuserdata/
+*.xcuserstate
+*.xcworkspace
+*.xcodeproj/
+
+# 通用忽略规则
+Thumbs.db
+ehthumbs.db
+Desktop.ini
