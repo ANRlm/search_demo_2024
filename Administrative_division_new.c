@@ -156,7 +156,7 @@ struct TreeNode* buildTree(struct Region regions[], int size) {
         return NULL;
     }
 
-    printf("开始创建节点...\n");
+    printf("开始创建节点...");
     // 创建所有节点并建立索引
     for (int i = 0; i < size; i++) {
         nodes[i] = createNode(regions[i]);
@@ -176,17 +176,16 @@ struct TreeNode* buildTree(struct Region regions[], int size) {
         codeToNode[i].code[MAX_CODE_LENGTH - 1] = '\0';
         codeToNode[i].node = nodes[i];
         
-        if (i % 1000 == 0) {
-            printf("\r已创建 %d/%d 个节点... (%.1f%%)", i, size, (float)i/size*100);
+        if (i % 1000 == 0 || i == size - 1) {
+            printf("\r已创建 %d/%d 个节点... (%.1f%%)", i + 1, size, (float)(i + 1)/size*100);
             fflush(stdout);
         }
     }
     printf("\n节点创建完成\n");
 
-    // 对映射数组进行排序，以支持二分查找
-    printf("正在对节点进行排序...\n");
+    printf("正在对节点进行排序...");
     qsort(codeToNode, size, sizeof(*codeToNode), compareCodeToNode);
-    printf("节点排序完成\n");
+    printf("完成\n");
 
     // 创建虚拟的全国根节点
     struct Region china = {
@@ -211,7 +210,7 @@ struct TreeNode* buildTree(struct Region regions[], int size) {
         return NULL;
     }
 
-    printf("开始建立父子关系...\n");
+    printf("开始建立父子关系...");
     // 使用二分查找建立父子关系
     for (int i = 0; i < size; i++) {
         if (strcmp(regions[i].parent_code, "0") == 0) {
@@ -242,9 +241,9 @@ struct TreeNode* buildTree(struct Region regions[], int size) {
             }
         }
         
-        if (i % 1000 == 0) {
+        if (i % 1000 == 0 || i == size - 1) {
             printf("\r已处理 %d/%d 个节点的父子关系... (%.1f%%)", 
-                   i, size, (float)i/size*100);
+                   i + 1, size, (float)(i + 1)/size*100);
             fflush(stdout);
         }
     }
@@ -284,31 +283,39 @@ struct TreeNode* findNodeByCode(struct TreeNode* root, const char* code) {
 void findByCode(struct TreeNode* node, const char* code) {
     struct TreeNode* found = findNodeByCode(node, code);
     if (found) {
-        printf("代码: %s\n", found->data.code);
         printf("名称: %s\n", found->data.name);
+        printf("代码: %s\n", found->data.code);
         if (found->data.level >= 0 && found->data.level <= 5) {
             printf("级别: %s\n", LEVEL_NAMES[found->data.level]);
         } else {
             printf("级别: 未知(%d)\n", found->data.level);
         }
         printf("类型: %d\n", found->data.type);
-        if (found->data.avg_house_price != NULL) {
+        
+        if (found->data.avg_house_price != NULL && *found->data.avg_house_price > 0) {
             printf("平均房价: %.2lf\n", *found->data.avg_house_price);
+        } else {
+            printf("平均房价: 暂无数据\n");
         }
-        if (found->data.employment_rate != NULL) {
+        
+        if (found->data.employment_rate != NULL && 
+            strcmp(found->data.employment_rate, "N/A") != 0) {
             printf("就业率: %s\n", found->data.employment_rate);
+        } else {
+            printf("就业率: 暂无数据\n");
         }
-
-        // 使用父节点指针打印所有上级地区
+        printf("行政区划层级关系：\n└─ %s", found->data.name);  // 移除换行符
+        
         struct TreeNode* current = found;
-        while (current->parent != NULL) {
+        while (current->parent != NULL && current->parent->data.level != 0) {
             current = current->parent;
             if (current->data.level >= 0 && current->data.level <= 5) {
-                printf("%s: %s\n", LEVEL_NAMES[current->data.level], current->data.name);
+                printf("\n   └─ 隶属于%s：%s", LEVEL_NAMES[current->data.level], current->data.name);
             } else {
-                printf("未知级别(%d): %s\n", current->data.level, current->data.name);
+                printf("\n   └─ 隶属于未知级别(%d)：%s", current->data.level, current->data.name);
             }
         }
+        printf("\n");  // 最后添加一个换行符
     } else {
         printf("未找到代码为 %s 的地区\n", code);
     }
@@ -331,7 +338,7 @@ int loadRegionsFromCSV(struct Region regions[], const char* filename) {
 
     char line[MAX_LINE_LENGTH];
     int count = 0;
-    printf("开始加载数据...\n");
+    printf("开始加载数据...");
 
     // 读取第一行，检查是否为标题行
     if (fgets(line, MAX_LINE_LENGTH, file)) {
@@ -396,7 +403,7 @@ int loadRegionsFromCSV(struct Region regions[], const char* filename) {
 
             regions[count].employment_rate = strdup((parsed_items >= 7) ? employment_rate_str : "N/A");
             if (regions[count].employment_rate == NULL) {
-                perror("内存分配失败");
+                printf("错误：内存分配失败\n");
                 free(regions[count].avg_house_price);
                 continue;
             }
@@ -412,7 +419,7 @@ int loadRegionsFromCSV(struct Region regions[], const char* filename) {
     }
 
     fclose(file);
-    printf("\n数据加载完成，共 %d 条记录\n", count);
+    printf("\r数据加载完成，共 %d 条记录\n", count);
     return count;
 }
 
@@ -423,7 +430,9 @@ void findByNameRecursive(struct TreeNode* root, const char* name, int* found) {
     if (root == NULL || *found >= 5) return;
     
     if (strstr(root->data.name, name) != NULL) {
-        printf("\n-------------------\n");
+        if (*found > 0) {
+            printf("----------------------------------------\n");
+        }
         printf("名称: %s\n", root->data.name);
         printf("代码: %s\n", root->data.code);
         if (root->data.level >= 0 && root->data.level <= 5) {
@@ -431,23 +440,31 @@ void findByNameRecursive(struct TreeNode* root, const char* name, int* found) {
         } else {
             printf("级别: 未知(%d)\n", root->data.level);
         }
-        if (root->data.avg_house_price != NULL) {
+        
+        if (root->data.avg_house_price != NULL && *root->data.avg_house_price > 0) {
             printf("平均房价: %.2lf\n", *root->data.avg_house_price);
-        }
-        if (root->data.employment_rate != NULL) {
-            printf("就业率: %s\n", root->data.employment_rate);
+        } else {
+            printf("平均房价: 暂无数据\n");
         }
         
-        // 使用父节点指针直接访问上级地区
+        if (root->data.employment_rate != NULL && 
+            strcmp(root->data.employment_rate, "N/A") != 0) {
+            printf("就业率: %s\n", root->data.employment_rate);
+        } else {
+            printf("就业率: 暂无数据\n");
+        }
+        printf("行政区划层级关系：\n└─ %s", root->data.name);
+        
         struct TreeNode* current = root;
-        while (current->parent != NULL) {
+        while (current->parent != NULL && current->parent->data.level != 0) {
             current = current->parent;
             if (current->data.level >= 0 && current->data.level <= 5) {
-                printf("%s: %s\n", LEVEL_NAMES[current->data.level], current->data.name);
+                printf("\n   └─ 隶属于%s：%s", LEVEL_NAMES[current->data.level], current->data.name);
             } else {
-                printf("未知级别(%d): %s\n", current->data.level, current->data.name);
+                printf("\n   └─ 隶属于未知级别(%d)：%s", current->data.level, current->data.name);
             }
         }
+        printf("\n");
         
         (*found)++;
         if (*found >= 5) {
@@ -524,10 +541,12 @@ int main() {
         return 1;
     }
 
+    printf("\n=== 中国行政区划数据管理与查询系统 ===\n");
+    
     int size = loadRegionsFromCSV(regions, "area_code_2024_new.csv");
 
     if (size == 0) {
-        printf("数据加载失败\n");
+        printf("错误：数据加载失败\n");
         free(regions);
         return 1;
     }
@@ -536,7 +555,7 @@ int main() {
 
     struct TreeNode* root = buildTree(regions, size);
     if (root == NULL) {
-        printf("树结构构建失败\n");
+        printf("错误：树结构构建失败\n");
         free(regions);
         return 1;
     }
@@ -544,40 +563,58 @@ int main() {
 
     int choice;
     char search_term[MAX_NAME_LENGTH];
-
+    
     while (1) {
-        printf("\n请选择查询方式：\n");
-        printf("1. 按代码查询地区\n");
-        printf("2. 按地区名称查询代码\n");
-        printf("3. 退出\n");
-        printf("请输入选择 (1-3): ");
+        printf("\n┌────────────────────────────────┐\n");
+        printf("│     行政区划数据查询系统       │\n");
+        printf("├────────────────────────────────┤\n");
+        printf("│  1. 按代码查询地区信息         │\n");
+        printf("│  2. 按名称查询地区信息         │\n");
+        printf("│  3. 退出系统                   │\n");
+        printf("└────────────────────────────────┘\n");
+        printf("\n请输入选项编号 [1-3]: ");
 
         if (scanf("%d", &choice) != 1) {
             while (getchar() != '\n');
-            printf("输入无效，请重试\n");
+            printf("\n输入无效，请输入数字 1-3\n");
             continue;
         }
         while (getchar() != '\n');
 
         switch (choice) {
             case 1:
-                printf("请输入区划代码：");
+                printf("\n=== 按代码查询 ===\n");
+                printf("请输入12位区划代码：");
                 if (fgets(search_term, MAX_NAME_LENGTH, stdin) != NULL) {
                     search_term[strcspn(search_term, "\n")] = 0;
+                    if (strlen(search_term) == 0) {
+                        printf("\n代码不能为空\n");
+                        continue;
+                    }
+                    printf("\n┌────────────── 查询结果 ──────────────┐\n\n");
                     findByCode(root, search_term);
+                    printf("\n└─────────────────────────────────────┘\n");
                 }
                 break;
 
             case 2:
+                printf("\n=== 按名称查询 ===\n");
                 printf("请输入地区名称：");
                 if (fgets(search_term, MAX_NAME_LENGTH, stdin) != NULL) {
                     search_term[strcspn(search_term, "\n")] = 0;
+                    if (strlen(search_term) == 0) {
+                        printf("\n名称不能为空\n");
+                        continue;
+                    }
+                    printf("\n┌────────────── 查询结果 ──────────────┐\n\n");
                     findByName(root, search_term);
+                    printf("\n└─────────────────────────────────────┘\n");
                 }
                 break;
 
             case 3:
-                printf("程序已退出\n");
+                printf("\n=== 正在退出系统 ===\n");
+                printf("清理资源中...\n");
                 freeTree(root);  // 释放树结构
                 for (int i = 0; i < size; i++) {
                     free(regions[i].avg_house_price);
@@ -587,14 +624,9 @@ int main() {
                 return 0;
 
             default:
-                printf("无效的选择，请重试\n");
+                printf("\n无效的选择，请输入 1-3\n");
         }
     }
 
-    for (int i = 0; i < size; i++) {
-        free(regions[i].avg_house_price);
-        free(regions[i].employment_rate);
-    }
-    free(regions);
     return 0;
 }
