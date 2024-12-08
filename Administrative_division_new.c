@@ -9,9 +9,6 @@
  * - 显示完整的行政区划层级关系
  * 
  * CSV格式：code,name,level,parent_code,type[,avg_house_price,employment_rate]
- * 
- * 行政级别：
- * 0-国家级, 1-省级, 2-地级, 3-县级, 4-乡级, 5-村级
  */
 
 #include <stdio.h>
@@ -21,10 +18,10 @@
 /**
  * @brief 程序使用的常量定义
  */
-#define MAX_NAME_LENGTH 100   // 地区名称最大长度，限制字符串大小
-#define MAX_CODE_LENGTH 20    // 地区代码最大长度，如"110000000000"
-#define MAX_LINE_LENGTH 1024  // CSV文件单行最大长度，用于读取缓冲区
-#define MAX_REGIONS 700000    // 地区数据最大数量，根据实际数据量设置
+#define MAX_NAME_LENGTH 100   // 地区名称最大长度
+#define MAX_CODE_LENGTH 20    // 地区代码最大长度
+#define MAX_LINE_LENGTH 1024  // CSV文件单行最大长度
+#define MAX_REGIONS 700000    // 地区数据最大数量
 
 /**
  * @brief 地区级别的名称数组
@@ -614,7 +611,7 @@ int main() {
 
             case 3:
                 printf("\n=== 正在退出系统 ===\n");
-                printf("清理资源中...\n");
+                printf("释放树结构...\n");
                 freeTree(root);  // 释放树结构
                 for (int i = 0; i < size; i++) {
                     free(regions[i].avg_house_price);
