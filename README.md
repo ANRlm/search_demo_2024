@@ -1,47 +1,92 @@
-# Search Demo 2024
+# 中国行政区划数据管理与查询系统
 
-## 项目简介 (Project Description)
-中国五级行政区划代码查询，纯 C 语言实现，无第三方依赖。
+基于树结构实现的中国行政区划数据管理与查询系统，支持完整的行政区划层级关系查询。本项目基于 [adyliu/china_area](https://github.com/adyliu/china_area) 的数据进行二次开发。
 
-区划数据来自: https://github.com/adyliu/china_area
+## 功能特点
 
-本项目仅使用 area_code_2024.csv 和 area_code_2024.sql 文件中的数据。
+- 从CSV文件加载行政区划数据
+- 构建多级树状结构存储区划关系
+- 支持按区划代码精确查询
+- 支持按地区名称模糊查询
+- 显示完整的行政区划层级关系
+- 支持额外的统计数据（房价、就业率等）
 
-仅用于学习交流，请勿用于其他用途。
+## 系统要求
 
-## 使用方式 (Usage)  
-以下提供两种检索方法，请确保已安装 gcc 编译器。
-### function 1
-进入项目根目录下打开终端
+- C语言编译器（支持C99标准）
+- 标准库：stdio.h, string.h, stdlib.h
+
+## 数据格式要求
+
+### CSV文件格式
+文件名：`area_code_2024_new.csv`
+
+必需字段：
+- code: 地区代码
+- name: 地区名称
+- level: 地区级别
+- parent_code: 父级地区代码
+- type: 地区类型
+
+可选字段（扩展）：
+- avg_house_price: 平均房价
+- employment_rate: 就业率
+
+### 数据规模
+- 最大支持70万条区划数据
+- 地区名称最大长度：100字符
+- 区划代码最大长度：20字符
+
+## 行政区划级别说明
+
+- 0级：国家级
+- 1级：省级（省、直辖市、自治区、特别行政区）
+- 2级：地级（地级市、地区、自治州、盟）
+- 3级：县级（市辖区、县级市、县、自治县、旗）
+- 4级：乡级（街道、镇、乡、苏木）
+- 5级：村级（居委会、村委会、嘎查）
+
+## 编译和运行
+
+### 编译
+```bash
+gcc Administrative_division_new.c -o Administrative_division_new
 ```
-# 编译程序
-gcc -o test test.c
 
-# 运行程序
-./test
+### 运行
+```bash
+./Administrative_division_new
 ```
 
-### function 2 (sql)
-进入项目根目录下打开终端, 确保已安装 sqlite3 开发库
+## 使用说明
+程序提供交互式界面，支持以下操作：
+1. 按代码查询地区
+2. 按地区名称查询代码
+3. 退出程序
+
+### 查询示例
+
+按代码查询：
 ```
-# 在 Ubuntu/Debian 上安装 sqlite3 开发库
-sudo apt-get install libsqlite3-dev
-
-# windows 安装 sqlite3 开发库
-https://www.sqlite.org/download.html
-
-# macos 安装 sqlite3 开发库
-brew install sqlite3
+请输入区划代码：110000000000
 ```
 
+按名称查询：
 ```
-# 编译程序
-gcc -o import import.c -lsqlite3
-gcc -o query query.c -lsqlite3
-
-# 导入数据
-./import
-
-# 查询数据
-./query
+请输入地区名称：北京
 ```
+
+## 注意事项
+- 确保输入文件使用UTF-8编码
+- 内存占用与数据量成正比
+- 首次加载大量数据时可能需要较长时间
+- 名称查询限制显示前5条匹配结果
+
+## 数据来源
+
+原始数据来自 [adyliu/china_area](https://github.com/adyliu/china_area)，该项目提供了中国行政区划的基础数据。本项目在此基础上进行二次开发。
+
+
+## 致谢
+
+感谢 [adyliu/china_area](https://github.com/adyliu/china_area) 项目提供的基础数据支持。
