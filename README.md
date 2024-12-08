@@ -36,7 +36,7 @@ SetConsoleOutputCP(CP_UTF8);
 SetConsoleCP(CP_UTF8);
 ```
 
-2. 编译
+2. 编译(确保已安装 gcc)
 ```bash
 gcc Administrative_division_new.c -o Administrative_division_new.exe
 ```
@@ -49,6 +49,8 @@ gcc Administrative_division_new.c -o Administrative_division_new.exe
 ### Linux/macOS 平台
 ```bash
 gcc Administrative_division_new.c -o Administrative_division_new
+# 或使用 clang(macOS)
+clang Administrative_division_new.c -o Administrative_division_new
 ```
 
 ### 运行
