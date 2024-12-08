@@ -38,7 +38,12 @@ SetConsoleCP(CP_UTF8);
 
 2. 编译
 ```bash
-gcc Administrative_division_new.c -o Administrative_division_new
+gcc Administrative_division_new.c -o Administrative_division_new.exe
+```
+
+3. 运行
+```bash
+./Administrative_division_new.exe
 ```
 
 ### Linux/macOS 平台
