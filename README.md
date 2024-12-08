@@ -85,8 +85,3 @@ gcc Administrative_division_new.c -o Administrative_division_new
 ## 数据来源
 
 原始数据来自 [adyliu/china_area](https://github.com/adyliu/china_area)，该项目提供了中国行政区划的基础数据。本项目在此基础上进行二次开发。
-
-
-## 致谢
-
-感谢 [adyliu/china_area](https://github.com/adyliu/china_area) 项目提供的基础数据支持。
