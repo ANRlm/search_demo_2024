@@ -1,46 +1,17 @@
 /**
- * @file test.c
+ * @file Administrative_division_new.c
  * @brief 中国行政区划数据管理与查询系统
  * 
- * @details
- * 本程序实现了一个基于树结构的中国行政区划数据管理系统，主要功能包括：
- * 1. 从CSV文件加载行政区划数据
- * 2. 构建多级树状结构存储区划关系
- * 3. 支持按区划代码精确查询
- * 4. 支持按地区名称模糊查询
- * 5. 显示完整的行政区划层级关系
- * 6. 支持额外的统计数据（如房价、就业率等）
+ * 功能：
+ * - 从CSV文件加载区划数据
+ * - 构建树状结构存储区划关系
+ * - 支持代码精确查询和名称模糊查询
+ * - 显示完整的行政区划层级关系
  * 
- * CSV文件格式要求：
- * - 文件名：area_code_2024_new.csv
- * - 必需字段：code,name,level,parent_code,type
- * - 可选字段：avg_house_price,employment_rate
+ * CSV格式：code,name,level,parent_code,type[,avg_house_price,employment_rate]
  * 
- * 数据规模支持：
- * - 最大支持70万条区划数据
- * - 地区名称最大长度：100字符
- * - 区划代码最大长度：20字符
- * 
- * 行政区划级别说明：
- * - 0级：国家级
- * - 1级：省级（省、直辖市、自治区、特别行政区）
- * - 2级：地级（地级市、地区、自治州、盟）
- * - 3级：县级（市辖区、县级市、县、自治县、旗）
- * - 4级：乡级（街道、镇、乡、苏木）
- * - 5级：村级（居委会、村委会、嘎查）
- * 
- * @author [ANRlm]
- * @date 2024-12-08
- * 
- * @note
- * 编译环境要求：
- * - 支持C99标准
- * - 需要标准库：stdio.h, string.h, stdlib.h
- * 
- * @warning
- * - 请确保输入文件编码为UTF-8
- * - 内存占用与数据量成正比，请确保系统有足够内存
- * - 首次加载大量数据时可能需要较长时间
+ * 行政级别：
+ * 0-国家级, 1-省级, 2-地级, 3-县级, 4-乡级, 5-村级
  */
 
 #include <stdio.h>
@@ -54,7 +25,6 @@
 #define MAX_CODE_LENGTH 20    // 地区代码最大长度，如"110000000000"
 #define MAX_LINE_LENGTH 1024  // CSV文件单行最大长度，用于读取缓冲区
 #define MAX_REGIONS 700000    // 地区数据最大数量，根据实际数据量设置
-#define HASH_SIZE 1000003     // 哈希表大小，选择大于数据量的质数以减少冲突
 
 /**
  * @brief 地区级别的名称数组
@@ -77,7 +47,7 @@ struct Region {
     char code[MAX_CODE_LENGTH];     // 地区代码，如"110000000000"
     char name[MAX_NAME_LENGTH];     // 地区名称，如"北京市"
     int level;                      // 地区级别，0-5分别对应不同行政级别
-    char parent_code[MAX_CODE_LENGTH]; // 父级地区代码，"0"示无父级
+    char parent_code[MAX_CODE_LENGTH]; // 父级地区代码，"0"表示无父级
     int type;                       // 地区类型，用于区分特殊行政区等
     double *avg_house_price;        // 平均房价，可选字段，NULL表示无数据
     char *employment_rate;          // 就业率，可选字段，NULL表示无数据
@@ -123,7 +93,7 @@ struct TreeNode* createNode(struct Region data) {
 }
 
 /**
- * @brief 向父节点添加子节点
+ * @brief 向父节点添加子节点，支持动态扩容
  * 
  * @param parent 父节点指针
  * @param child 子节点指针
@@ -143,7 +113,7 @@ void addChild(struct TreeNode* parent, struct TreeNode* child) {
 }
 
 /**
- * @brief 比较两个节点的代码，用于qsort排序
+ * @brief 比较函数，用于节点排序
  * 
  * @param a 第一个节点的指针
  * @param b 第二个节点的指针
@@ -159,7 +129,8 @@ static int compareCodeToNode(const void* a, const void* b) {
 }
 
 /**
- * @brief 构建地区树
+ * @brief 构建行政区划树
+ * @note 采用二分查找优化父子关系建立
  * 
  * @param regions 地区信息数组
  * @param size 地区信息数组大小
@@ -286,27 +257,8 @@ struct TreeNode* buildTree(struct Region regions[], int size) {
 }
 
 /**
- * @brief 打印树结构（用于调试）
- * 
- * @param node 当前节点
- * @param level 当前节点的层级
- */
-void printTree(struct TreeNode* node, int level) {
-    if (node == NULL) return;
-
-    for (int i = 0; i < level; i++) printf("  ");
-    printf("%s - %s\n", node->data.code, node->data.name);
-
-    for (int i = 0; i < node->child_count; i++) {
-        printTree(node->children[i], level + 1);
-    }
-}
-
-/**
- * @brief 按代码查找节点
- * @note 采用深度优先搜索算法遍历树结构
- * 时间复杂度：O(n)，其中n为节点总数
- * 空间复杂度：O(h)，其中h为树的高度
+ * @brief 按代码查找节点 (DFS算法)
+ * @complexity 时间O(n), 空间O(h), h为树高
  * 
  * @param root 搜索的起始节点
  * @param code 要查找的地区代码
@@ -324,7 +276,7 @@ struct TreeNode* findNodeByCode(struct TreeNode* root, const char* code) {
 }
 
 /**
- * @brief 通过地区代码查找地区信息并打印，包括所有上级地区
+ * @brief 按代码查询并显示完整行政层级
  * 
  * @param root 地区树的根节点
  * @param code 要查找的地区代码
@@ -363,13 +315,8 @@ void findByCode(struct TreeNode* node, const char* code) {
 }
 
 /**
- * @brief 从CSV文件中加载地区数据
- * @note 处理步骤
- * 1. 打开并检查CSV文件
- * 2. 读取第一行，判断是否为标题行
- * 3. 逐行解析数据，包括可选的房价和就业率字段
- * 4. 动态分配内存存储可选字段
- * 5. 定期显示加载进度
+ * @brief 从CSV加载数据
+ * @note 支持可选的房价和就业率字段
  * 
  * @param regions 用于存储解析结果的地区数组
  * @param filename CSV文件名
@@ -471,18 +418,10 @@ int loadRegionsFromCSV(struct Region regions[], const char* filename) {
 
 /**
  * @brief 递归查找地区名称
- * @note 采用深度优先搜索算法，支持模糊匹配
- * 限制最多显示5条匹配结果
- * 对每个匹配项显示完整的行政区划层级
- * 
- * @param root 当前遍历的树节点
- * @param name 要查找的地区名称（支持部分匹配）
- * @param found 已找到的匹配项数量
  */
 void findByNameRecursive(struct TreeNode* root, const char* name, int* found) {
     if (root == NULL || *found >= 5) return;
     
-    // 检查当前节点
     if (strstr(root->data.name, name) != NULL) {
         printf("\n-------------------\n");
         printf("名称: %s\n", root->data.name);
@@ -499,19 +438,14 @@ void findByNameRecursive(struct TreeNode* root, const char* name, int* found) {
             printf("就业率: %s\n", root->data.employment_rate);
         }
         
-        // 打印所有上级地区
-        struct TreeNode* current = findNodeByCode(root, root->data.code);
-        while (current && strcmp(current->data.parent_code, "0") != 0) {
-            struct TreeNode* parent = findNodeByCode(root, current->data.parent_code);
-            if (parent) {
-                if (parent->data.level >= 0 && parent->data.level <= 5) {
-                    printf("%s: %s\n", LEVEL_NAMES[parent->data.level], parent->data.name);
-                } else {
-                    printf("未知级别(%d): %s\n", parent->data.level, parent->data.name);
-                }
-                current = parent;
+        // 使用父节点指针直接访问上级地区
+        struct TreeNode* current = root;
+        while (current->parent != NULL) {
+            current = current->parent;
+            if (current->data.level >= 0 && current->data.level <= 5) {
+                printf("%s: %s\n", LEVEL_NAMES[current->data.level], current->data.name);
             } else {
-                break;
+                printf("未知级别(%d): %s\n", current->data.level, current->data.name);
             }
         }
         
@@ -522,18 +456,17 @@ void findByNameRecursive(struct TreeNode* root, const char* name, int* found) {
         }
     }
     
-    // 递归搜索子节点
     for (int i = 0; i < root->child_count; i++) {
         findByNameRecursive(root->children[i], name, found);
     }
 }
 
 /**
- * @brief 通过地区名称查找地区信息并打印
+ * @brief 按名称查询接口
  * 
  * @param root 地区树的根节点
  * @param name 要查找的地区名称
- * @note 最多显示20条匹配结果
+ * @note 最多显示5条匹配结果
  */
 void findByName(struct TreeNode* root, const char* name) {
     if (root == NULL) return;
@@ -560,7 +493,7 @@ void findByName(struct TreeNode* root, const char* name) {
 }
 
 /**
- * @brief 释放树结构占用的内存
+ * @brief 释放树结构内存
  * 
  * @param root 要释放的树的根节点
  * @note 会递归释放所有子节点
@@ -579,13 +512,8 @@ void freeTree(struct TreeNode* root) {
 }
 
 /**
- * @brief 程序主入口
- * @note 主要流程：
- * 1. 分配内存存储地区数据
- * 2. 从CSV文件加载数据
- * 3. 构建树形结构
- * 4. 进入交互式查询循环
- * 5. 程序退出时释放所有资源
+ * @brief 主程序入口
+ * @note 提供交互式查询界面
  * 
  * @return 程序执行状态码：0-成功，1-失败
  */
@@ -613,12 +541,6 @@ int main() {
         return 1;
     }
     printf("树结构构建完成\n");
-
-    // 打印根节点信息和直接子节点数量
-    printf("根节点信息：\n");
-    printf("名称: %s\n", root->data.name);
-    printf("代码: %s\n", root->data.code);
-    printf("直接子节点数量: %d\n", root->child_count);
 
     int choice;
     char search_term[MAX_NAME_LENGTH];
