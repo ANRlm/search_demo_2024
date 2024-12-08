@@ -26,7 +26,22 @@ code,name,level,parent_code,type[,avg_house_price,employment_rate]
 
 ## 使用方法
 
-### 编译
+### Windows 平台
+1. 在源代码头部添加以下内容：
+```c
+#include <windows.h>
+
+// 在 main 函数开始处添加：
+SetConsoleOutputCP(CP_UTF8);
+SetConsoleCP(CP_UTF8);
+```
+
+2. 编译
+```bash
+gcc Administrative_division_new.c -o Administrative_division_new
+```
+
+### Linux/macOS 平台
 ```bash
 gcc Administrative_division_new.c -o Administrative_division_new
 ```
@@ -45,10 +60,23 @@ gcc Administrative_division_new.c -o Administrative_division_new
 ## 系统要求
 - C99标准编译器
 - UTF-8编码支持
+- Windows 平台需要设置控制台为 UTF-8 编码
+
+## 平台特定说明
+
+### Windows
+- 需要包含 `windows.h` 头文件
+- 需要设置控制台代码页为 UTF-8
+- 建议使用支持 UTF-8 的终端（如 Windows Terminal）
+
+### Linux/macOS
+- 默认支持 UTF-8 编码
+- 无需额外配置
 
 ## 注意事项
 - 名称查询限制显示前5条匹配结果
 - 数据文件需为UTF-8编码
+- Windows 平台下如显示乱码，请确保已正确设置 UTF-8 编码
 
 ## 数据来源
 基于 [adyliu/china_area](https://github.com/adyliu/china_area) 的数据进行开发。
