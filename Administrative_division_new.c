@@ -41,7 +41,7 @@ const char* LEVEL_NAMES[] = {
 
 /**
  * @brief 行政区划实体结构
- * @details 包含基本信息及扩展数据字段
+ * @details ���含基本信息及扩展数据字段
  */
 struct Region {
     char code[MAX_CODE_LENGTH];        ///< 区划代码
@@ -368,10 +368,13 @@ static void displayNodeInfo(struct TreeNode* node, int show_separator) {
         (node->data.level >= 0 && node->data.level <= 5) ? 
         LEVEL_NAMES[node->data.level] : "未知级别");
     
-    // 扩展数据显示
-    printf("平均房价: %s\n", 
-        (node->data.avg_house_price && *node->data.avg_house_price > 0) ? 
-        "有数据" : "暂无数据");
+    // 修改扩展数据显示部分
+    if (node->data.avg_house_price && *node->data.avg_house_price > 0) {
+        printf("平均房价: %.2f 元/平方米\n", *node->data.avg_house_price);
+    } else {
+        printf("平均房价: 暂无数据\n");
+    }
+    
     printf("就业率: %s\n", 
         (node->data.employment_rate && strcmp(node->data.employment_rate, "N/A") != 0) ? 
         node->data.employment_rate : "暂无数据");
