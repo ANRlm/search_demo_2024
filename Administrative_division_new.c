@@ -41,7 +41,7 @@ const char* LEVEL_NAMES[] = {
 
 /**
  * @brief 行政区划实体结构
- * @details ���含基本信息及扩展数据字段
+ * @details 含基本信息及扩展数据字段
  */
 struct Region {
     char code[MAX_CODE_LENGTH];        ///< 区划代码
