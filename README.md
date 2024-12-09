@@ -15,7 +15,10 @@
 ```csv
 code,name,level,parent_code,type[,avg_house_price,employment_rate]
 ```
-
+### CSV文件名
+```bash
+area_data.csv
+```
 ### 行政级别
 - 0级：国家级
 - 1级：省级（省、直辖市、自治区等）
@@ -38,24 +41,24 @@ SetConsoleCP(CP_UTF8);
 
 2. 编译(确保已安装 gcc)
 ```bash
-gcc Administrative_division_new.c -o Administrative_division_new.exe
+gcc Administrative_division.c -o Administrative_division.exe
 ```
 
 3. 运行
 ```bash
-./Administrative_division_new.exe
+./Administrative_division.exe
 ```
 
 ### Linux/macOS 平台
 ```bash
-gcc Administrative_division_new.c -o Administrative_division_new
+gcc Administrative_division.c -o Administrative_division
 # 或使用 clang(macOS)
-clang Administrative_division_new.c -o Administrative_division_new
+clang Administrative_division.c -o Administrative_division
 ```
 
 ### 运行
 ```bash
-./Administrative_division_new
+./Administrative_division
 ```
 
 ### 查询示例
