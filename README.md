@@ -91,10 +91,12 @@ clang Administrative_division.c -o Administrative_division
 - 有多个查询结果时，默认显示前5条
 - 通过修改 `findByNameRecursive` 函数中的 `max_results` 变量来修改显示结果数量
 ```c
-if (root == NULL || *found >= max_results) return; // line 287
+// line 287
+if (root == NULL || *found >= max_results) return;
 
+// line 292
 if (*found >= max_results) {
-    printf("\n结果过多，仅显示前max_results条...\n"); // line 292
+    printf("\n结果过多，仅显示前max_results条...\n");
 }
 ```
 <br>
