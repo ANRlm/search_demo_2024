@@ -2,27 +2,33 @@
 
 基于树结构实现的中国行政区划数据管理系统，支持完整的行政区划层级关系查询。
 
-加载CSV文件 < 0.1 秒 构建树结构 < 0.15 秒
+### 性能
+- 加载CSV文件 < 0.1 秒
+- 构建树结构 < 0.15 秒
+- 查询 < 0.01 秒
 
-## 主要功能
+### 主要功能
 
 - 支持代码精确查询和名称模糊查询
 - 显示完整的行政区划层级关系
 - 支持扩展数据（房价、就业率等）
 - 基于树结构的高效存储和查询
-- 使用二分查找及深度优先搜索加快查询速度
-
+- 使用二分查找及深度优先搜索加快查询速度<br>
+<br>
 ## 数据格式
 
 ### CSV文件格式
 ```csv
 code,name,level,parent_code,type[,avg_house_price,employment_rate](optional)
+
+# 示例
+# 110000000000,北京市,1,0,0,66946,96%
 ```
 ### CSV文件名
 ```bash
 area_data.csv
 ```
-你可以使用 `area_data.csv` 作为默认文件名，也可以使用其他文件名。
+你也可以使用其他文件名，并且修改 `loadRegionsFromCSV` 函数中的文件名
 ```c
 // line 533
 int size = loadRegionsFromCSV(regions, "your_file_name.csv");
@@ -33,7 +39,8 @@ int size = loadRegionsFromCSV(regions, "your_file_name.csv");
 - 2级：地级（地级市、地区、自治州等）
 - 3级：县级（市辖区、县级市、县等）
 - 4级：乡级（街道、镇、乡等）
-- 5级：村级（居委会、村委会等）
+- 5级：村级（居委会、村委会等）<br>
+<br>
 
 ## 使用方法（项目根目录下）
 
@@ -73,10 +80,23 @@ clang Administrative_division.c -o Administrative_division
 ```
 
 ### 查询示例
-```
+```bash
 1. 按代码查询：110000000000（北京市）
 2. 按名称查询：北京（支持模糊匹配）
 ```
+<br>
+
+## 自定义名称查询结果数量
+- 有多个查询结果时，默认显示前5条
+- 通过修改 `findByNameRecursive` 函数中的 `max_results` 变量来修改显示结果数量
+```c
+if (root == NULL || *found >= max_results) return; // line 287
+
+if (*found >= max_results) {
+    printf("\n结果过多，仅显示前max_results条...\n"); // line 292
+}
+```
+<br>
 
 ## 系统要求
 - C99标准编译器
@@ -95,9 +115,9 @@ clang Administrative_division.c -o Administrative_division
 - 无需额外配置
 
 ## 注意事项
-- 名称查询限制显示前5条匹配结果
-- 数据文件需为UTF-8编码
-- Windows 平台下如显示乱码，请确保已正确设置 UTF-8 编码
+- 名称查询限制显示前5条匹配结果（修改方法见上文）
+- CSV数据文件需为UTF-8编码
+- Windows 平台下如显示乱码，请确保环境已正确设置 UTF-8 编码
 
 ## 数据来源
 基于 [adyliu/china_area](https://github.com/adyliu/china_area) 的数据进行开发。
